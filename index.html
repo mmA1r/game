@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./index.css" rel="stylesheet" />
+    <title>Game</title>
+    <script defer src="./index.js"></script>
+</head>
+    <body>
+        <!--<canvas id="gameCanvas" width="800" height="400"></canvas>-->
+        <div class="playground">
+            <div class="ground hidden">
+                <div class="boat"></div>
+                <div class="water"></div>
+                <div class="grass"></div>
+                <div class="left-ground upground">
+                    <div class="passanger friend"></div>
+                    <div class="passanger friend"></div>
+                    <div class="passanger friend"></div>
+                    <div class="passanger enemy"></div>
+                    <div class="passanger enemy"></div>
+                    <div class="passanger enemy"></div>
+                </div>
+                <div class="right-ground upground"></div>
+            </div>
+            <div class="button-wrapper">
+                <button id="play-button">Play</button>
+                <button id="go-button" class="hidden">Go</button>
+                <button id="try-again-button" class="hidden">Try again!</button>
+            </div>
+            <h2 class="message hidden"></h2>
+        </div>
+    </body>
+</html>

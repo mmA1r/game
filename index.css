@@ -107,16 +107,20 @@ button:hover {
 
 .passanger {
     cursor: pointer;
-    width: 35px;
-    height: 35px;
+    width: 45px;
+    height: 45px;
+
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top;
 }
 
 .enemy {
-    background-color: red;
+    background-image: url('./assets/pngwing.com.png');
 }
 
 .friend {
-    background-color: aqua;
+    background-image: url('./assets/elf.png');
 }
 
 .upground {
@@ -148,4 +152,56 @@ button:hover {
     text-align: center;
 
     font-size: 28px;
+}
+
+.try {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+
+    width: max-content;
+    height: max-content;
+
+    font-size: 24px;
+
+    transform: translateX(-50%);
+}
+
+.timer {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+
+    width: max-content;
+    height: max-content;
+
+    font-size: 20px;
+
+    transform: translateX(-50%);
+}
+
+.score-board {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    padding: 4px;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 70%;
+
+    width: 100px;
+
+    transform: translateY(-50%);
+
+    border: 1px solid black;
+
+    overflow-y: auto;
+
+    >span {
+        width: 100%;
+        text-align: center;
+        margin: 4px 0;
+    }
 }

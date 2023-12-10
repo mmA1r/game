@@ -1,8 +1,20 @@
-localStorage.setItem('leftFriend', 3);
-localStorage.setItem('leftEnemy', 3);
+let leftFriends = 3;
+let leftEnemy = 3;
+let forwardedFriends = 0;
+let forwardedEnemy = 0;
 
-localStorage.setItem('forwardedFriend', 0);
-localStorage.setItem('forwardedEnemy', 0);
+let tryNumber = localStorage.getItem('try');
+
+if(!tryNumber) {
+    localStorage.setItem('try', 1);
+    tryNumber = localStorage.getItem('try');
+} else {
+    localStorage.setItem('try', tryNumber-0+1);
+    tryNumber = localStorage.getItem('try');
+}
+
+const tryContainer = document.querySelector('.try');
+tryContainer.innerHTML = `Попытка ${ tryNumber }`;
 
 const passangers = document.querySelectorAll('.passanger');
 const boat = document.querySelector('.boat');
@@ -14,7 +26,22 @@ const playButton = document.getElementById('play-button');
 const goButton = document.getElementById('go-button');
 const againButton = document.getElementById('try-again-button');
 
+const timer = document.getElementById("timer");
+const scoreBoard = document.querySelector('.score-board');
 const message = document.querySelector('.message');
+
+const checkResults = () => {
+    for(let i = 0; i < tryNumber-0; i++) {
+        const tryNumSeconds = localStorage.getItem(`try-${i}`);
+        if(tryNumSeconds) {
+            let span = document.createElement('span');
+            span.textContent = `Попытка ${i}: ${tryNumSeconds}`;
+            scoreBoard.appendChild(span);
+        }
+    }
+}
+
+checkResults();
 
 againButton.addEventListener('click', () => {
     location.reload();
@@ -22,18 +49,15 @@ againButton.addEventListener('click', () => {
 
 goButton.addEventListener('click', () => {
     if (boat.children.length > 0) {
-        const leftFriend = localStorage.getItem('leftFriend');
-        const leftEnemy = localStorage.getItem('leftEnemy');
-        const forwardedFriend = localStorage.getItem('forwardedFriend');
-        const forwardedEnemy = localStorage.getItem('forwardedEnemy');
 
-        if ((leftFriend < leftEnemy && leftFriend > 0) || (forwardedFriend < forwardedEnemy && forwardedFriend > 0)) {
+        if ((leftFriends < leftEnemy && leftFriends > 0) || (forwardedFriends < forwardedEnemy && forwardedFriends > 0)) {
             playground.classList.add('hidden');
             goButton.classList.add('hidden');
             againButton.classList.remove('hidden');
 
             message.innerHTML = 'Вы проиграли!';
             message.classList.remove('hidden');
+            stopTimer();
         } else {
             if (!boat.classList.contains('boat-right')) {
                 boat.classList.add('boat-right');
@@ -48,26 +72,23 @@ playButton.addEventListener('click', () => {
     playground.classList.remove('hidden');
     goButton.classList.remove('hidden')
     playButton.classList.add('hidden');
+    startTimer();
 });
 
 passangers.forEach(passanger => {
     passanger.addEventListener('click', () => {
-        const leftFriend = localStorage.getItem('leftFriend');
-        const leftEnemy = localStorage.getItem('leftEnemy');
-        const forwardedFriend = localStorage.getItem('forwardedFriend');
-        const forwardedEnemy = localStorage.getItem('forwardedEnemy');
 
         const list = passanger.classList;
 
         // на лодку с берега
-        if (!list.contains('on-boat') && boat.children.length < 2 && !list.contains('forwarded')) {
+        if (!list.contains('on-boat') && boat.children.length < 2 && !list.contains('forwarded') && !boat.classList.contains('boat-right')) {
             list.add('on-boat');
             boat.appendChild(passanger);
 
             if(passanger.classList.contains('friend')) {
-                localStorage.setItem("leftFriend", leftFriend-1);
+                leftFriends-=1;
             } else {
-                localStorage.setItem("leftEnemy", leftEnemy-1);
+                leftEnemy-=1;
             }
         } else
         // спустить с лодки переправленного
@@ -77,30 +98,32 @@ passangers.forEach(passanger => {
             rightGround.append(passanger);
 
             if(passanger.classList.contains('friend')) {
-                localStorage.setItem("forwardedFriend", forwardedFriend-0+1);
+                forwardedFriends+=1;
             } else {
-                localStorage.setItem("forwardedEnemy", forwardedEnemy-0+1);
+                forwardedEnemy+=1;
             }
 
-            if (localStorage.getItem('forwardedFriend')-0 === 3 && localStorage.getItem('forwardedEnemy')-0 === 3) {
+            if (forwardedFriends === 3 && forwardedEnemy === 3) {
                 playground.classList.add('hidden');
                 goButton.classList.add('hidden');
                 againButton.classList.remove('hidden');
                 
                 message.innerHTML = 'Вы выиграли!';
                 message.classList.remove('hidden');
+                stopTimer();
+                localStorage.setItem(`try-${tryNumber-0}`, timer.innerText);
             }
         } else
         // забрать на лодку переправленного
-        if (list.contains('forwarded') && !list.contains('on-boat') && boat.children.length < 2) {
+        if (list.contains('forwarded') && !list.contains('on-boat') && boat.children.length < 2 && boat.classList.contains('boat-right')) {
             list.remove('forwarded');
             list.add('on-boat');
             boat.appendChild(passanger);
 
             if(passanger.classList.contains('friend')) {
-                localStorage.setItem("forwardedFriend", forwardedFriend-1);
+                forwardedFriends-=1;
             } else {
-                localStorage.setItem("forwardedEnemy", forwardedEnemy-1);
+                forwardedEnemy-=1;
             }
         } else
         // с лодки обратно на берег
@@ -109,11 +132,35 @@ passangers.forEach(passanger => {
             leftGround.appendChild(passanger);
 
             if(passanger.classList.contains('friend')) {
-                localStorage.setItem("leftFriend", leftFriend-0+1);
+                leftFriends+=1;
             } else {
-                localStorage.setItem("leftEnemy", leftEnemy-0+1);
+                leftEnemy+=1;
             }
         }
     });
 });
+
+let startTime;
+let elapsedTime = 0;
+let timerInterval;
+
+function startTimer() {
+  startTime = Date.now() - elapsedTime;
+  timerInterval = setInterval(updateTimer, 10);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function updateTimer() {
+  const currentTime = Date.now();
+  elapsedTime = currentTime - startTime;
+  const minutes = Math.floor(elapsedTime / 60000);
+  const seconds = Math.floor((elapsedTime % 60000) / 1000);
+  const milliseconds = Math.floor((elapsedTime % 1000) / 10);
+  
+  timer.textContent =
+    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
+}
 

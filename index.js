@@ -3,6 +3,8 @@ let leftEnemy = 3;
 let forwardedFriends = 0;
 let forwardedEnemy = 0;
 
+let turnCount = 0;
+
 let tryNumber = localStorage.getItem('try');
 
 if(!tryNumber) {
@@ -14,6 +16,7 @@ if(!tryNumber) {
 }
 
 const tryContainer = document.querySelector('.try');
+const turnCounter = document.querySelector('.turn');
 tryContainer.innerHTML = `Попытка ${ tryNumber }`;
 
 const passangers = document.querySelectorAll('.passanger');
@@ -32,10 +35,11 @@ const message = document.querySelector('.message');
 
 const checkResults = () => {
     for(let i = 0; i < tryNumber-0; i++) {
-        const tryNumSeconds = localStorage.getItem(`try-${i}`);
-        if(tryNumSeconds) {
+        const tries = localStorage.getItem(`try-${i}`);
+        if(tries) {
+            const [seconds, turns] = tries.split(' ');
             let span = document.createElement('span');
-            span.textContent = `Попытка ${i}: ${tryNumSeconds}`;
+            span.textContent = `Попытка ${i}: \n Время:${seconds} \n Ходов: ${turns}`;
             scoreBoard.appendChild(span);
         }
     }
@@ -49,7 +53,8 @@ againButton.addEventListener('click', () => {
 
 goButton.addEventListener('click', () => {
     if (boat.children.length > 0) {
-
+        turnCount++;
+        turnCounter.textContent = `Ходов: ${turnCount}`;
         if ((leftFriends < leftEnemy && leftFriends > 0) || (forwardedFriends < forwardedEnemy && forwardedFriends > 0)) {
             playground.classList.add('hidden');
             goButton.classList.add('hidden');
@@ -111,7 +116,7 @@ passangers.forEach(passanger => {
                 message.innerHTML = 'Вы выиграли!';
                 message.classList.remove('hidden');
                 stopTimer();
-                localStorage.setItem(`try-${tryNumber-0}`, timer.innerText);
+                localStorage.setItem(`try-${tryNumber-0}`, `${timer.innerText} ${turnCount}`);
             }
         } else
         // забрать на лодку переправленного

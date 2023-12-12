@@ -156,6 +156,19 @@ button:hover {
 
 .try {
     position: absolute;
+    top: 20px;
+    left: 50%;
+
+    width: max-content;
+    height: max-content;
+
+    font-size: 24px;
+
+    transform: translateX(-50%);
+}
+
+.turn {
+    position: absolute;
     top: 50px;
     left: 50%;
 
@@ -203,5 +216,6 @@ button:hover {
         width: 100%;
         text-align: center;
         margin: 4px 0;
+        font-size: 12px;
     }
 }

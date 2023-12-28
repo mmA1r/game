@@ -8,10 +8,7 @@ let turnCount = 0;
 let tryNumber = localStorage.getItem('try');
 
 if(!tryNumber) {
-    localStorage.setItem('try', 1);
-    tryNumber = localStorage.getItem('try');
-} else {
-    localStorage.setItem('try', tryNumber-0+1);
+    localStorage.setItem('try', 0);
     tryNumber = localStorage.getItem('try');
 }
 
@@ -34,18 +31,52 @@ const scoreBoard = document.querySelector('.score-board');
 const message = document.querySelector('.message');
 
 const checkResults = () => {
-    for(let i = 0; i < tryNumber-0; i++) {
+    const triesTop = {};
+
+    for(let i = 0; i <= tryNumber-0; i++) {
         const tries = localStorage.getItem(`try-${i}`);
         if(tries) {
             const [seconds, turns] = tries.split(' ');
-            let span = document.createElement('span');
-            span.textContent = `Попытка ${i}: \n Время:${seconds} \n Ходов: ${turns}`;
-            scoreBoard.appendChild(span);
+            const splitted = seconds.split(/[:.]/).map(val => val-0);
+            splitted.push(i);
+            if(triesTop[turns]) {
+                triesTop[turns].push(splitted);
+            } else {
+                triesTop[turns] = [splitted];
+            }
         }
     }
-}
 
-checkResults();
+    Object.values(triesTop).forEach(values => {
+        values
+            .sort((x, y) => x[0] - y[0])
+            .sort((x, y) => {
+                if (x[0] !== y[0]) {
+                    return;
+                }
+                return x[1] - y[1];
+            })
+            .sort((x, y) => {
+                if (x[0] !== y[0]) {
+                    return;
+                }
+                if (x[1] === y[1]) {
+                    return x[2] - y[2];
+                }
+            });
+    });
+
+    let innerIndex = 1;
+
+    Object.entries(triesTop).forEach(([ key, value ]) => {
+        value.forEach(result => {
+            let span = document.createElement('span');
+            span.textContent = `${innerIndex}: Попытка: ${result[3]} || \n Ходов: ${key} || \n Время:${result[0] + ':' + result[1] + ':' + result[2]}`;
+            scoreBoard.appendChild(span);
+            innerIndex+=1;
+        });
+    });
+}
 
 againButton.addEventListener('click', () => {
     location.reload();
@@ -74,9 +105,18 @@ goButton.addEventListener('click', () => {
 });
 
 playButton.addEventListener('click', () => {
+    localStorage.setItem('try', tryNumber-0+1);
+    tryNumber = localStorage.getItem('try');
+    tryContainer.innerHTML = `Попытка ${ tryNumber }`;
+
+    document.querySelector('.water-back').classList.remove('hidden');
+    document.querySelector('.turn').classList.remove('hidden');
+    document.querySelector('.timer').classList.remove('hidden');
+
     playground.classList.remove('hidden');
     goButton.classList.remove('hidden')
     playButton.classList.add('hidden');
+    document.querySelector('.start-screen-button').classList.remove('start-screen-button');
     startTimer();
 });
 
@@ -108,15 +148,18 @@ passangers.forEach(passanger => {
                 forwardedEnemy+=1;
             }
 
-            if (forwardedFriends === 3 && forwardedEnemy === 3) {
+            if (forwardedFriends === 3 && forwardedEnemy === 3) {                       // Победа
                 playground.classList.add('hidden');
                 goButton.classList.add('hidden');
+                document.querySelector('.water-back').classList.add('hidden');
                 againButton.classList.remove('hidden');
                 
                 message.innerHTML = 'Вы выиграли!';
                 message.classList.remove('hidden');
-                stopTimer();
+                scoreBoard.classList.remove('score-hidden');
                 localStorage.setItem(`try-${tryNumber-0}`, `${timer.innerText} ${turnCount}`);
+                checkResults();
+                stopTimer();
             }
         } else
         // забрать на лодку переправленного

@@ -84,6 +84,8 @@ againButton.addEventListener('click', () => {
 
 goButton.addEventListener('click', () => {
     if (boat.children.length > 0) {
+        goButton.setAttribute('disabled', true);
+
         turnCount++;
         turnCounter.textContent = `Ходов: ${turnCount}`;
         if ((leftFriends < leftEnemy && leftFriends > 0) || (forwardedFriends < forwardedEnemy && forwardedFriends > 0)) {
@@ -101,6 +103,69 @@ goButton.addEventListener('click', () => {
                 boat.classList.remove('boat-right');
             }
         }
+
+        setTimeout(() => {
+            let friends = 0;
+            let enemies = 0;
+
+            passangers.forEach(passanger => {
+                if (boat.classList.contains('boat-right')) {
+                    if ((
+                            passanger.classList.contains('enemy') && 
+                            passanger.classList.contains('on-boat')
+                        ) || (
+                            passanger.classList.contains('enemy') && 
+                            passanger.classList.contains('forwarded')
+                        )
+                    ) {
+                        enemies++;
+                    }
+                    if ((
+                            passanger.classList.contains('friend') && 
+                            passanger.classList.contains('on-boat')
+                        ) || (
+                            passanger.classList.contains('friend') && 
+                            passanger.classList.contains('forwarded')
+                        )
+                    ) {
+                        friends++;
+                    }
+                } else {
+                    if ((
+                            passanger.classList.contains('enemy') && 
+                            passanger.classList.contains('on-boat')
+                        ) || (
+                            passanger.classList.contains('enemy') && 
+                            !passanger.classList.contains('forwarded')
+                        )
+                    ) {
+                        enemies++;
+                    }
+                    if ((
+                            passanger.classList.contains('friend') && 
+                            passanger.classList.contains('on-boat')
+                        ) || (
+                            passanger.classList.contains('friend') && 
+                            !passanger.classList.contains('forwarded')
+                        )
+                    ) {
+                        friends++;
+                    }
+                }
+            });
+
+            if (friends < enemies && friends > 0) {
+                playground.classList.add('hidden');
+                goButton.classList.add('hidden');
+                againButton.classList.remove('hidden');
+
+                message.innerHTML = 'Вы проиграли!';
+                message.classList.remove('hidden');
+                stopTimer();
+            }
+
+            goButton.removeAttribute('disabled');
+        }, 750);
     }
 });
 
